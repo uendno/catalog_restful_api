@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 from flask_restful import Api
 from app.resources.registration import Registration
 from app.resources.category_list import CategoryList
@@ -16,6 +17,8 @@ def create_app():
     from app.db import init_db
 
     app = Flask(__name__)
+
+    CORS(app)
 
     app.config.from_object(config)
     api = Api(app)

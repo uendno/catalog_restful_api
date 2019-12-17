@@ -9,3 +9,5 @@ virtualenv
 pytest
 coverage
 pytest-cov
+flask-cors
+pyjwt
