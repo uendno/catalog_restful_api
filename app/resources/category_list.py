@@ -1,7 +1,8 @@
 from flask_restful import Resource, request
+
+from app.security import jwt_required
 from ..models.category import CategoryModel
 from ..schemas.category import CategorySchema
-from flask_jwt import jwt_required
 from ..handles.common_handles import InvalidUsage, ServerProblem, BadRequest
 
 
@@ -31,7 +32,7 @@ class CategoryList(Resource):
 
     @staticmethod
     @jwt_required()
-    def post():
+    def post(user):
         """
         Add new category to the database
         :return: data of new category being added

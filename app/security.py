@@ -1,24 +1,38 @@
-from .models.user import UserModel
+from functools import wraps
+
+import jwt
 from werkzeug.security import check_password_hash
+from flask import request
+
+from app.config import config
+from .models.user import UserModel
+from app.handles.common_handles import AuthorizationProblem
 
 
-def authenticate(username, password):
+def jwt_required():
     """
-    Helper function to authenticate username and password
-    :param username: username being provided
-    :param password: password being provided
-    :return: user if username and password are correct
+    Check access token if it's required and then decode it
+    :return:
     """
-    user = UserModel.find_by_username(username)
-    if user and check_password_hash(user.password, password):
-        return user
+    def decorated(f):
+        @wraps(f)
+        def wrapper(*args, **kwargs):
 
+            access_token = request.headers.get('Authorization')
 
-def identity(payload):
-    """
-    Helper function to define what is contained inside the payload of JWT
-    :param payload: payload of the identity
-    :return: user id of the user being authenticated at the moment
-    """
-    user_id = payload['identity']
-    return UserModel.find_by_id(user_id)
+            print(access_token)
+            if access_token is not None:
+                try:
+                    decoded_data = jwt.decode(
+                        access_token.replace('Bearer ', ''), config.SECRET_KEY, algorithms=['HS256'])
+                    print(decoded_data)    
+                    kwargs['user'] = UserModel.find_by_id(decoded_data['id'])
+                except Exception as e:
+                    print(e)
+                    raise AuthorizationProblem()
+
+            return f(*args, **kwargs)
+
+        return wrapper
+
+    return decorated

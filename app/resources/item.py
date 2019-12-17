@@ -1,10 +1,11 @@
 from flask_restful import Resource, request
+from marshmallow import ValidationError
+
+from app.security import jwt_required
 from ..models.item import ItemModel
 from ..models.category import CategoryModel
 from ..schemas.item import ItemSchema
-from flask_jwt import jwt_required, current_identity
 from ..handles.common_handles import ServerProblem, AuthorizationProblem, NotFound, BadRequest
-from marshmallow import ValidationError
 
 
 class Item(Resource):
@@ -31,7 +32,7 @@ class Item(Resource):
 
     @staticmethod
     @jwt_required()
-    def put(category_id, item_id):
+    def put(category_id, item_id, user):
         """
         Update existing item based on category_id and item_id being provided
         :param category_id: category of the item being updated
@@ -50,7 +51,7 @@ class Item(Resource):
         if not item:
             raise NotFound()
         else:
-            if current_identity.id != item.user_id:
+            if user.id != item.user_id:
                 raise AuthorizationProblem()
             item.name = data['name']
             item.description = data['description']
@@ -63,7 +64,7 @@ class Item(Resource):
 
     @staticmethod
     @jwt_required()
-    def delete(category_id, item_id):
+    def delete(category_id, item_id, user):
         """
         Delete the existing item from the database
         :param category_id: category of the item being removed
@@ -76,7 +77,7 @@ class Item(Resource):
         item = ItemModel.find_by_id_and_category(category_id, item_id)
         if not item:
             raise NotFound()
-        if current_identity.id != item.user_id:
+        if user.id != item.user_id:
             raise AuthorizationProblem()
         try:
             item.delete_from_db()

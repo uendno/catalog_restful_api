@@ -1,10 +1,11 @@
 from flask_restful import Resource, request
+from marshmallow import ValidationError
+
+from app.security import jwt_required
 from ..models.item import ItemModel
 from ..models.category import CategoryModel
 from ..schemas.item import ItemSchema
-from flask_jwt import jwt_required, current_identity
 from ..handles.common_handles import ServerProblem, InvalidUsage, NotFound, BadRequest
-from marshmallow import ValidationError
 
 
 class ItemList(Resource):
@@ -15,7 +16,7 @@ class ItemList(Resource):
 
     @staticmethod
     @jwt_required()
-    def post(category_id):
+    def post(category_id, user):
         """
         Add new item to the database
         :param category_id: category_id of the item being added
@@ -34,7 +35,7 @@ class ItemList(Resource):
                          data['description'],
                          data['price'],
                          category_id,
-                         current_identity.id)
+                         user.id)
         try:
             item.save_to_db()
         except Exception:
