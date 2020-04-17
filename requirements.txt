@@ -10,4 +10,4 @@ pytest
 coverage
 pytest-cov
 flask-cors
-pyjwt
+pyjwt==1.4.0

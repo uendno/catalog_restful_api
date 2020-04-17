@@ -3,7 +3,7 @@
 ## Project Description
 
 This is the restful api that provided simple CRUD actions for Catalog application. The documentation of the API being 
-supported can be viewed through this URL: https://robertgotitapp.docs.apiary.io/#
+supported can be viewed through this URL: https://catalogrestfulapi.docs.apiary.io/#
 
 ## Prerequisites
 
