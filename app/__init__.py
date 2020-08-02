@@ -39,13 +39,13 @@ def create_app():
         return jsonify({
             'status_code': 404,
             'message': 'Not found'
-        })
+        }), 404
 
     @app.errorhandler(_BaseErrorHandler)
     def handle_error(error):
         print(error)
         response = jsonify(error.to_dict())
         response.status_code = error.status_code
-        return response
+        return response, error.status_code
 
     return app

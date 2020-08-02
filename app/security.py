@@ -14,22 +14,24 @@ def jwt_required():
     Check access token if it's required and then decode it
     :return:
     """
+
     def decorated(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
 
             access_token = request.headers.get('Authorization')
 
-            print(access_token)
             if access_token is not None:
                 try:
                     decoded_data = jwt.decode(
                         access_token.replace('Bearer ', ''), config.SECRET_KEY, algorithms=['HS256'])
-                    print(decoded_data)    
+                    print(decoded_data)
                     kwargs['user'] = UserModel.find_by_id(decoded_data['id'])
                 except Exception as e:
                     print(e)
                     raise AuthorizationProblem()
+            else:
+                raise AuthorizationProblem()
 
             return f(*args, **kwargs)
 
